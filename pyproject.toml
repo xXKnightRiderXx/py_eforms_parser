@@ -25,3 +25,6 @@ license-files = ["LICEN[CS]E*"]
 [project.urls]
 Homepage = "https://github.com/xXKnightRiderXx/py_eforms_parser"
 Issues = "https://github.com/xXKnightRiderXx/py_eforms_parser/issues"
+
+[tool.black]
+line-length = 120
