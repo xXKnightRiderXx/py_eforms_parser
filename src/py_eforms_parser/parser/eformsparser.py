@@ -4,7 +4,7 @@ import typing
 import xml.etree.ElementTree
 
 from py_eforms_parser.objects.tender import Tender
-from py_eforms_parser.objects.types import DocumentType
+from py_eforms_parser.objects.types import DocumentType, NoticeType
 
 logger = logging.getLogger(__name__)
 
@@ -98,9 +98,27 @@ class EformsParser:
         logger.info(f"Extracted document type string: {document_type}")
         return DocumentType(document_type)
 
+    def _parse_notice_type(self, element: xml.etree.ElementTree.Element) -> NoticeType:
+        """Parse the notice type of the eForms file
+
+        Pares the notice type of the eForms file from the "cbc:NoticeTypeCode" subelement of the root node. Be aware
+        that the notice type is considered mandatory and a ValueError will be raised if the corresponding element is
+        missing.
+
+        Args:
+            element (xml.etree.ElementTree.Element): Root element of the XML tree
+
+        Returns:
+            NoticeType: Notice Type of the eForms file
+        """
+        notice_value = self._get_required_text(element, "cbc:NoticeTypeCode")
+        logger.debug(f"Extracted notice type code: {notice_value}")
+        return NoticeType(notice_value)
+
     def parse(self) -> Tender:
         root_element = self.xml_tree.getroot()
         if root_element is None:
             raise ValueError("Could not retrieve root element from XML document!")
         document_type = self._parse_document_type(root_element)
-        return Tender(type=document_type)
+        notice_type = self._parse_notice_type(root_element)
+        return Tender(type=document_type, notice_type=notice_type)
