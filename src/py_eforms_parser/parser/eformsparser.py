@@ -115,10 +115,29 @@ class EformsParser:
         logger.debug(f"Extracted notice type code: {notice_value}")
         return NoticeType(notice_value)
 
+    def _parse_notice_id(self, element: xml.etree.ElementTree.Element) -> str:
+        """Parse the ID of the notice
+
+        Each tender/notice has an identifier that identifies it amongst all other existing ones. This method parses
+        this ID from the "cbc:ID" subelement of the root node. An ID is considered mandatory and a ValueError will be
+        raised if the corresponding element is missing.
+        See: https://docs.ted.europa.eu/eforms/latest/schema/notice-information.html#noticeIDSection
+
+        Args:
+            element (xml.etree.ElementTree.Element): Root element of the XML tree
+
+        Returns:
+            str: The ID of the tender
+        """
+        id_value = self._get_required_text(element, "cbc:ID")
+        logger.debug(f"Extracted notice ID: {id_value}")
+        return id_value
+
     def parse(self) -> Tender:
         root_element = self.xml_tree.getroot()
         if root_element is None:
             raise ValueError("Could not retrieve root element from XML document!")
         document_type = self._parse_document_type(root_element)
         notice_type = self._parse_notice_type(root_element)
-        return Tender(type=document_type, notice_type=notice_type)
+        notice_id = self._parse_notice_id(root_element)
+        return Tender(type=document_type, notice_type=notice_type, notice_id=notice_id)

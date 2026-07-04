@@ -87,3 +87,24 @@ class TestParseNoticeType:
         element = make_root_element()
         with pytest.raises(ValueError):
             parser._parse_notice_type(element)  # type: ignore
+
+
+class TestParseNoticeId:
+
+    @pytest.mark.parametrize(
+        "expected_id,notice_id",
+        [("d503ead5-0e2e-492f-973e-6541c9e88180", "d503ead5-0e2e-492f-973e-6541c9e88180"), ("24061260", "24061260")],
+    )
+    def test_parse_notice_id(self, parser: EformsParser, expected_id: str, notice_id: str):
+        element = make_root_element(body=f"<cbc:ID>{expected_id}</cbc:ID>")
+        assert parser._parse_notice_id(element) == notice_id  # type: ignore
+
+    def test_empty_notice_id_raises_value_error(self, parser: EformsParser):
+        element = make_root_element(body=f"<cbc:ID></cbc:ID>")
+        with pytest.raises(ValueError):
+            parser._parse_notice_id(element)  # type: ignore
+
+    def test_missing_notice_id_raises_value_error(self, parser: EformsParser):
+        element = make_root_element()
+        with pytest.raises(ValueError):
+            parser._parse_notice_id(element)  # type: ignore
