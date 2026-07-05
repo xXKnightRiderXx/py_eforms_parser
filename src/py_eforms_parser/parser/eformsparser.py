@@ -145,11 +145,18 @@ class EformsParser:
         Args:
             element (xml.etree.ElementTree.Element): The root element of the XML tree
 
+        Raises:
+            ValueError: If extracted version is 0 or less
+
         Returns:
             int: An integer representing the version of the notice
         """
         version_value = self._get_required_text(element, "cbc:VersionID")
         logger.debug(f"Extracted version: {version_value}. Trying to convert to integer")
+        version = int(version_value)
+        logger.debug(f"Converted to version: {version}")
+        if version <= 0:
+            raise ValueError(f"Version must be larger than 0 but extracted value: {version}")
         return int(version_value)
 
 

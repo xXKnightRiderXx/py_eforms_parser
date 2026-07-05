@@ -120,6 +120,15 @@ class TestParseNoticeVersion:
         element = make_root_element(body=f"<cbc:VersionID>{expected_version}</cbc:VersionID>")
         assert parser._parse_notice_version(element) == notice_version  # type: ignore
 
+    @pytest.mark.parametrize(
+        "invalid_version",
+        [("00"), ("0"), ("-1"), ("-10")],
+    )
+    def test_invalid_notice_id_raises_value_error(self, parser: EformsParser, invalid_version: str):
+        element = make_root_element(body=f"<cbc:VersionID>{invalid_version}</cbc:VersionID>")
+        with pytest.raises(ValueError):
+            parser._parse_notice_version(element)  # type: ignore
+
     def test_empty_notice_version_raises_value_error(self, parser: EformsParser):
         element = make_root_element(body=f"<cbc:VersionID></cbc:VersionID>")
         with pytest.raises(ValueError):
