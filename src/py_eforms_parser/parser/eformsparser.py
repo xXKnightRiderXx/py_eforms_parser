@@ -133,6 +133,26 @@ class EformsParser:
         logger.debug(f"Extracted notice ID: {id_value}")
         return id_value
 
+    def _parse_notice_version(self, element: xml.etree.ElementTree.Element) -> int:
+        """Parse the version of the notice
+
+        Each tender/notice has a version that can be used to identify newer iterations of the same notice. This version
+        should be a positive integer, hence we extract and convert it accordingly.
+        See: https://docs.ted.europa.eu/eforms/latest/schema/notice-information.html#noticeIDSection
+        Please note: I also observed that many tenders leave the version at 1 and issue a completely new ID if a new
+        revision is published.
+
+        Args:
+            element (xml.etree.ElementTree.Element): The root element of the XML tree
+
+        Returns:
+            int: An integer representing the version of the notice
+        """
+        version_value = self._get_required_text(element, "cbc:VersionID")
+        logger.debug(f"Extracted version: {version_value}. Trying to convert to integer")
+        return int(version_value)
+
+
     def parse(self) -> Tender:
         root_element = self.xml_tree.getroot()
         if root_element is None:
@@ -140,4 +160,5 @@ class EformsParser:
         document_type = self._parse_document_type(root_element)
         notice_type = self._parse_notice_type(root_element)
         notice_id = self._parse_notice_id(root_element)
-        return Tender(type=document_type, notice_type=notice_type, notice_id=notice_id)
+        notice_version = self._parse_notice_version(root_element)
+        return Tender(type=document_type, notice_type=notice_type, notice_id=notice_id, notice_version=notice_version)

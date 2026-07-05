@@ -10,3 +10,4 @@ class Tender(pydantic.BaseModel):
     type: DocumentType
     notice_type: NoticeType
     notice_id: str
+    notice_version: int

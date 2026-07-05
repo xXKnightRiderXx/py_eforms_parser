@@ -108,3 +108,24 @@ class TestParseNoticeId:
         element = make_root_element()
         with pytest.raises(ValueError):
             parser._parse_notice_id(element)  # type: ignore
+
+
+class TestParseNoticeVersion:
+
+    @pytest.mark.parametrize(
+        "expected_version,notice_version",
+        [("01", 1), ("03", 3), ("4", 4)],
+    )
+    def test_parse_notice_id(self, parser: EformsParser, expected_version: str, notice_version: str):
+        element = make_root_element(body=f"<cbc:VersionID>{expected_version}</cbc:VersionID>")
+        assert parser._parse_notice_version(element) == notice_version  # type: ignore
+
+    def test_empty_notice_version_raises_value_error(self, parser: EformsParser):
+        element = make_root_element(body=f"<cbc:VersionID></cbc:VersionID>")
+        with pytest.raises(ValueError):
+            parser._parse_notice_version(element)  # type: ignore
+
+    def test_missing_notice_version_raises_value_error(self, parser: EformsParser):
+        element = make_root_element()
+        with pytest.raises(ValueError):
+            parser._parse_notice_version(element)  # type: ignore
